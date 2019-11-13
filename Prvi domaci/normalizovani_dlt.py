@@ -59,7 +59,7 @@ def normalizacija_tacaka(tacke):
             IV korak:
             Trazena matrica normalizacije je T = S*G
     '''
-    T = np.dot(S, G)
+    T = np.matmul(S, G)
     return T
 
 def matrica_2_9(X, Xp):
@@ -119,12 +119,13 @@ def normalizovani_DLT(tacke):
     T = normalizacija_tacaka([tacke['A'], tacke['B'], tacke['C'], tacke['D'], tacke['E'], tacke['F']])
     print("T = \n", T.round(6))
 
-    normalizovane['A'] = np.dot(T, tacke['A'])
-    normalizovane['B'] = np.dot(T, tacke['B'])
-    normalizovane['C'] = np.dot(T, tacke['C'])
-    normalizovane['D'] = np.dot(T, tacke['D'])
-    normalizovane['E'] = np.dot(T, tacke['E'])
-    normalizovane['F'] = np.dot(T, tacke['F'])
+    normalizovane['A'] = np.matmul(T, tacke['A'])
+    print("\n Normalizovane ['A'] = ", normalizovane['A'])
+    normalizovane['B'] = np.matmul(T, tacke['B'])
+    normalizovane['C'] = np.matmul(T, tacke['C'])
+    normalizovane['D'] = np.matmul(T, tacke['D'])
+    normalizovane['E'] = np.matmul(T, tacke['E'])
+    normalizovane['F'] = np.matmul(T, tacke['F'])
 
     '''
             II korak:
@@ -133,12 +134,12 @@ def normalizovani_DLT(tacke):
     Tp = normalizacija_tacaka( [tacke['Ap'], tacke['Bp'], tacke['Cp'], tacke['Dp'], tacke['Ep'], tacke['Fp']])
     print("Tp = \n", Tp.round(6))
 
-    normalizovane['Ap'] = np.dot(Tp, tacke['Ap'])
-    normalizovane['Bp'] = np.dot(Tp, tacke['Bp'])
-    normalizovane['Cp'] = np.dot(Tp, tacke['Cp'])
-    normalizovane['Dp'] = np.dot(Tp, tacke['Dp'])
-    normalizovane['Ep'] = np.dot(Tp, tacke['Ep'])
-    normalizovane['Fp'] = np.dot(Tp, tacke['Fp'])
+    normalizovane['Ap'] = np.matmul(Tp, tacke['Ap'])
+    normalizovane['Bp'] = np.matmul(Tp, tacke['Bp'])
+    normalizovane['Cp'] = np.matmul(Tp, tacke['Cp'])
+    normalizovane['Dp'] = np.matmul(Tp, tacke['Dp'])
+    normalizovane['Ep'] = np.matmul(Tp, tacke['Ep'])
+    normalizovane['Fp'] = np.matmul(Tp, tacke['Fp'])
 
     '''
             III korak:
