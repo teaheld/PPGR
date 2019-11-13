@@ -3,6 +3,8 @@
 '''
 import numpy as np
 
+np.set_printoptions(precision=10, suppress=True)
+
 def ucitaj_tacke(data):
     '''
             Fja prima putanju do fajla.
@@ -260,12 +262,47 @@ def modifikovani_DLT(tacke, br_tacaka):
     '''
     return P
 
+def promena_koordinata(tacke, br_tacaka):
+    '''
+            Prvo zadamo neku matricu promene koordinata.
+    '''
+    CC = [[0, 1, 2],
+          [-1, 0, 3],
+          [0, 0, 1]]
+    '''
+            Koordinate originala i slika u novom koordinatnom sistemu.
+    '''
+    nove_tacke = dict(zip([chr(ord('A') + x) for x in range(0, br_tacaka)] + [(chr(ord('A') + x) + "p") for x in range(0, br_tacaka)], \
+                             [tuple(np.matmul(CC, tacke[chr(ord('A') + x)]).flatten()) for x in range(0, br_tacaka)] +
+                             [tuple(np.matmul(CC, tacke[(chr(ord('A') + x) + "p")]).flatten()) for x in range(0, br_tacaka)]))
+
+    '''
+            Ako je P matrica transformacije u starim koordinatama,
+            tada je matrica transformacije u novim
+            P_p = T_p * P * T^-1, 
+            gde su T_p i T matrice transformacije koordinata.
+            Posto trazimo matricu transformacije u starim koordinatama,
+            racunamo
+            P = T_p^-1 * P_p * T.
+            U ovom primeru, 
+            i za slike i za originale smo koristili istu matricu transformacije.
+    '''
+    CC_inv = np.linalg.inv(CC)
+    P_novo = DLT(nove_tacke, br_tacaka)
+    P = CC_inv.dot(P_novo).dot(CC)
+    return P
+
+def reskaliranje(matrica):
+    return matrica / matrica[0][1] * 3
+
+def poredi(matrica1, matrica2):
+    return matrica2 - matrica1
 
 def main():
     '''
             Prvo uzimamo listu tacaka iz zeljenog primera.
     '''
-    t = ucitaj_tacke("data/primer1.txt")
+    t = ucitaj_tacke("data/primer3.txt")
     br_tacaka = int(len(t) / 2)
 
     '''
@@ -285,11 +322,20 @@ def main():
             moze se izvrsiti sledeci kod:
                 print(np.reshape(np.array(naivni(tacke).flatten()) * 0.142857238, (3, 3)))
     '''
-    print("\nNaivni: \n", naivni(tacke).round(7))
+    N = naivni(tacke)
+    print("\nNaivni: \n ",  N)
 
-    print("\nDLT: \n", DLT(tacke, br_tacaka).round(5))
+    P = DLT(tacke, br_tacaka)
+    print("\nDLT: \n", P)
 
-    print("\nModifikovani DLT:\n", modifikovani_DLT(tacke, br_tacaka).round(5))
+    Pn = modifikovani_DLT(tacke, br_tacaka)
+    print("\nModifikovani DLT:\n", Pn)
+
+    P_ = promena_koordinata(tacke, br_tacaka)
+    print("\nPosle promene i vracanja koordinata\n kada uporedimo DLT u starim\n i novim koordinatama:\n",
+            poredi(reskaliranje(P), reskaliranje(P_)))
+
+
 
 if __name__ == '__main__':
 	main()
