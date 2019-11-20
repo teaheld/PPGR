@@ -1,7 +1,7 @@
 import numpy as np
 import math
 
-np.set_printoptions(precision=10, suppress=True)
+np.set_printoptions(precision = 10, suppress = True)
 
 
 def Euler2A(fi, teta, psi):
@@ -71,7 +71,7 @@ def AxisAngle(A):
             ako je [u, u', p] < 0
             p = -p. 
     '''
-    if (np.cross(u, u_p)).dot(p):
+    if (np.cross(u, u_p)).dot(p) < 0:
         p = -p
 
     '''
@@ -86,11 +86,11 @@ def Rodriqez(p, fi):
             Formule preuzete sa prezentacije, strana 7.
     '''
     ppt = np.matmul(p[np.newaxis].transpose(), p[np.newaxis])
-    px = np.matrix([[0, -p[2], p[1]],
+    px = [[0, -p[2], p[1]],
           [p[2], 0, -p[0]],
-          [-p[1], p[0], 0]])
+          [-p[1], p[0], 0]]
 
-    return ppt + math.cos(fi) * (np.eye(3) - ppt) + math.sin(fi) * px
+    return ppt + math.cos(fi) * (np.eye(3) - ppt) + math.sin(fi) * np.array(px)
 
 def A2Euler(A):
     '''
@@ -126,12 +126,43 @@ def AxisAngle2Q(p, fi):
 
     return (x, y, z, w)
 
+def Q2AxisAngle(q):
+    '''
+            Slajdovi, strana 35.
+    '''
+    q = q / la.norm(q, 2)
+    '''
+            q = xi + yj + zk + w.
+            Zelimo fi iz [0, pi]
+    '''
+    w = q[3]
+    if w < 0:
+        q = -q
+
+    fi = 2 * math.acos(w)
+
+    p = [1, 0, 0]
+    if abs(w) != 1:
+        pom = [q[0], q[1], q[2]]
+        p = pom / la.norm(pom, 2)
+
+    return p, fi
+
 def main():
+    ulaz = -np.arctan(1/4), -np.arcsin(8/9), np.arctan(4)
+    print("Ulaz =  \n", ulaz)
     A = Euler2A(-np.arctan(1/4), -np.arcsin(8/9), np.arctan(4))
+    print("Matrica A = \n", A)
     p, fi = AxisAngle(A)
-    Rp = Rodriqez(p, fi)
-    E_fi, E_teta, E_psi = A2Euler(A)
-    quaternions = AxisAngle2Q(p, fi)
+    print("Rotacija oko prave p za ugao fi\nVektor p = ", p, ", Ugao fi = ", fi)
+    A_R = Rodriqez(p, fi)
+    print("Matrica rotacije A = \n", A_R)
+    fi_E, teta_E, psi_E = A2Euler(A_R)
+    print("Ojlerovi uglovi\n", "Fi = ", fi_E, ", Teta = ", teta_E, ", Psi = ", psi_E)
+    kvaternioni = AxisAngle2Q(p, fi)
+    print("Koeficijenti kvaterniona = ", kvaternioni)
+    p_Q, fi_Q = Q2AxisAngle(kvaternioni)
+    print("Rotacije oko prave p i ugla fi za dati kvaternion\n", "p = ", p_Q, ", fi = ", fi_Q)
 
 if __name__ == '__main__':
 	main()
