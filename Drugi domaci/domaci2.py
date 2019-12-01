@@ -1,8 +1,29 @@
 import numpy as np
+from numpy import linalg as la
 import math
 
 np.set_printoptions(precision = 10, suppress = True)
 
+def OrtVek(vektor):
+    '''
+            Ako su dva vektora
+            p[x, y, z] i q[a, b, c]
+            normalna, onda je njihov skalarni proizvod = 0.
+            tj. pq = xa + yb + zc.
+    '''
+    ortogonalni = np.zeros(len(vektor))
+    for i in range(0, len(vektor)):
+        if vektor[i] == 0:
+            ortogonalni[i] = 1
+            return ortogonalni
+
+    ortogonalni = np.ones(len(vektor))
+    sum = 0
+    for i in range(0, len(vektor) - 1):
+        sum +=  vektor[i]
+
+    ortogonalni[len(vektor) - 1] = - sum / vektor[len(vektor) - 1]
+    return ortogonalni
 
 def Euler2A(fi, teta, psi):
     '''
@@ -27,8 +48,6 @@ def Euler2A(fi, teta, psi):
     '''
     return np.matmul(np.matmul(Rz, Ry), Rx)
 
-
-from numpy import linalg as la
 def AxisAngle(A):
 
     '''
@@ -47,12 +66,12 @@ def AxisAngle(A):
 
     '''
             Odrediti proizvoljan jedinicni vektor u _|_ p.
-            
-            Posto je matrica ulaz matrica A koja je simetricna,
-            Sopstveni vektori su normalni jedni na druge, 
-            pa cemo uzeti proizvoljan sopstveni vektor koji nismo iskoristili.
     '''
-    u = v[:, len(p) - i_lambda -1].real
+    u = OrtVek(p)
+    '''
+            Normalizacija vektora.
+    '''
+    u = u / la.norm(u, 2)
 
     '''
             u' = Au,
@@ -81,7 +100,7 @@ def AxisAngle(A):
     '''
     return (p, fi)
 
-def Rodriqez(p, fi):
+def Rodrigez(p, fi):
     '''
             Formule preuzete sa prezentacije, strana 7.
     '''
@@ -112,6 +131,7 @@ def A2Euler(A):
             '''
             psi = math.atan2(-A[0][1], A[1][1])
     else:
+        teta = -math.pi / 2
         psi = math.atan2(-A[0][1], A[1][1])
 
     return (fi, teta, psi)
@@ -149,13 +169,13 @@ def Q2AxisAngle(q):
     return p, fi
 
 def main():
-    ulaz = -np.arctan(1/4), -np.arcsin(8/9), np.arctan(4)
+    ulaz = -np.arctan(2/5), -np.arcsin(7/8), np.arctan(3)
     print("Ulaz =  \n", ulaz)
-    A = Euler2A(-np.arctan(1/4), -np.arcsin(8/9), np.arctan(4))
+    A = Euler2A(-np.arctan(2/5), -np.arcsin(7/8), np.arctan(3))
     print("Matrica A = \n", A)
     p, fi = AxisAngle(A)
     print("Rotacija oko prave p za ugao fi\nVektor p = ", p, ", Ugao fi = ", fi)
-    A_R = Rodriqez(p, fi)
+    A_R = Rodrigez(p, fi)
     print("Matrica rotacije A = \n", A_R)
     fi_E, teta_E, psi_E = A2Euler(A_R)
     print("Ojlerovi uglovi\n", "Fi = ", fi_E, ", Teta = ", teta_E, ", Psi = ", psi_E)
@@ -163,6 +183,7 @@ def main():
     print("Koeficijenti kvaterniona = ", kvaternioni)
     p_Q, fi_Q = Q2AxisAngle(kvaternioni)
     print("Rotacije oko prave p i ugla fi za dati kvaternion\n", "p = ", p_Q, ", fi = ", fi_Q)
+
 
 if __name__ == '__main__':
 	main()
