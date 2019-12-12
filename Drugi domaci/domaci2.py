@@ -104,7 +104,12 @@ def Rodrigez(p, fi):
     '''
             Formule preuzete sa prezentacije, strana 7.
     '''
-    ppt = np.matmul(p[np.newaxis].transpose(), p[np.newaxis])
+    p = p / la.norm(p)
+
+    #ppt = np.matmul(p[np.newaxis].transpose(), p[np.newaxis])
+    ppt = np.matmul([[p[0]],
+               [p[1]],
+               [p[2]]], [p])
     px = [[0, -p[2], p[1]],
           [p[2], 0, -p[0]],
           [-p[1], p[0], 0]]
@@ -155,14 +160,13 @@ def Q2AxisAngle(q):
             q = xi + yj + zk + w.
             Zelimo fi iz [0, pi]
     '''
-    w = q[3]
-    if w < 0:
+    if q[3] < 0:
         q = -q
 
-    fi = 2 * math.acos(w)
+    fi = 2 * math.acos(q[3])
 
     p = [1, 0, 0]
-    if abs(w) != 1:
+    if abs(q[3]) != 1:
         pom = [q[0], q[1], q[2]]
         p = pom / la.norm(pom, 2)
 
